@@ -63,7 +63,7 @@ const Home: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex justify-center h-screen">
-        <div className="bg-red-200 w-full border-x border-slate-400 md:max-w-2xl">
+        <div className="w-full border-x border-slate-400 md:max-w-2xl">
       <div className="border-b border-slate-400 p-4">
         {!user.isSignedIn && <div className="flex justify-center"><SignInButton/></div>}
         {user.isSignedIn && <CreatePostWizard/>}
