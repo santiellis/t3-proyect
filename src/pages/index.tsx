@@ -5,20 +5,20 @@ import Link from "next/link";
 
 import { api } from "~/utils/api";
 import type { RouterOutputs } from "~/utils/api";
-
+import toast from "react-hot-toast";
 
 import dayjs from "dayjs";
-import relativeTime from "dayjs/plugin/relativeTime"
+import relativeTime from "dayjs/plugin/relativeTime";
 import Image from "next/image";
-import { LoadingPage } from "~/components/loading";
+import { LoadingPage, LoadingSpinner } from "~/components/loading";
 import { useState } from "react";
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 
 const CreatePostWizard = () => {
   const { user } = useUser();
 
-  const [input, setInput] = useState("")
+  const [input, setInput] = useState("");
 
   const ctx = api.useContext();
 
@@ -27,8 +27,15 @@ const CreatePostWizard = () => {
       setInput("");
       void ctx.post.getAll.invalidate();
     },
-  }
-  );
+    onError: (e) => {
+      const errorMessage = e.data?.zodError?.fieldErrors.content;
+      if (errorMessage && errorMessage[0]) {
+        toast.error(errorMessage[0]);
+      } else {
+        toast.error("Failed to Post! Please try again later.");
+      }
+    },
+  });
 
   if (!user) return null;
 
@@ -47,9 +54,25 @@ const CreatePostWizard = () => {
         type="text"
         value={input}
         onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            if (input !== "") {
+              mutate({ content: input });
+            }
+          }
+        }}
         disabled={isPosting}
       />
-      <button onClick={() => mutate({content: input})}>Post</button>
+      {input !== "" && !isPosting && (
+        <button onClick={() => mutate({ content: input })}>Post</button>
+      )}
+
+      {isPosting && (
+        <div className="flex justify-center">
+          <LoadingSpinner size={20} />
+        </div>
+      )}
     </div>
   );
 };
@@ -70,8 +93,11 @@ const PostView = (props: PostWithUser) => {
         />
         <div className="flex flex-col">
           <div className="flex gap-1 text-slate-300">
-            <span>{`@${author.username}`}</span> 
-            <span className="font-thin"> {`· ${dayjs(post.createdAt).fromNow()}`} </span>
+            <span>{`@${author.username}`}</span>
+            <span className="font-thin">
+              {" "}
+              {`· ${dayjs(post.createdAt).fromNow()}`}{" "}
+            </span>
           </div>
           <span className="text-2xl">{post.content}</span>
         </div>
@@ -80,32 +106,30 @@ const PostView = (props: PostWithUser) => {
   );
 };
 
-const Feed = () =>{
-
+const Feed = () => {
   const { data, isLoading: postLoading } = api.post.getAll.useQuery();
 
-  if (postLoading) return <LoadingPage/>;
+  if (postLoading) return <LoadingPage />;
 
   if (!data) return <div>Something went wrong!</div>;
 
   return (
     <div className="flex flex-col">
-            {data.map((fullPost) => (
-              <PostView {...fullPost} key={fullPost.post.id} />
-            ))}
-          </div>
-  )
-
-}
+      {data.map((fullPost) => (
+        <PostView {...fullPost} key={fullPost.post.id} />
+      ))}
+    </div>
+  );
+};
 
 const Home: NextPage = () => {
-  const { isLoaded: userLoaded, isSignedIn} = useUser();
+  const { isLoaded: userLoaded, isSignedIn } = useUser();
 
   // Start fetching asap
   api.post.getAll.useQuery();
 
   //Return empty div if user isn't loaded yet
-  if (!userLoaded) return <div/>;
+  if (!userLoaded) return <div />;
 
   return (
     <>
@@ -124,8 +148,8 @@ const Home: NextPage = () => {
             )}
             {isSignedIn && <CreatePostWizard />}
           </div>
-          
-          <Feed/>
+
+          <Feed />
         </div>
         <SignIn path="/sign-in" routing="path" signUpUrl="/sign-up" />
       </main>
