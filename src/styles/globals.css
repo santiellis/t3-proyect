@@ -5,4 +5,15 @@
 
 body {
     @apply bg-black text-slate-100;
+
+    overscroll-behavior: none;
 }
+
+html {
+    overflow:   scroll;
+  }
+  
+  ::-webkit-scrollbar {
+      width: 0px;
+      background: transparent; /* make scrollbar transparent */
+  }
