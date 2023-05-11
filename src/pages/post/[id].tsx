@@ -4,6 +4,7 @@ import { api } from "~/utils/api";
 import { PageLayout } from "~/components/layout";
 import { PostView } from "~/components/postview";
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
+import Link from "next/link";
 
 
 
@@ -20,6 +21,11 @@ const SinglePostPage: NextPage<{ id: string }> = ({ id }) => {
         <title>{`${data.post.content} - @${data.author.username}`}</title>
       </Head>
       <PageLayout>
+      <Link href="https://t3-proyect.santiagoellis.dev/">
+        <div className="text-slate-400 ml-4 hover">
+         ↼ Back Home
+        </div>
+        </Link>
        <PostView {...data}/>
       </PageLayout>
     </>

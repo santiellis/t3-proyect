@@ -10,7 +10,7 @@ body {
 }
 
 html {
-    overflow:   scroll;
+    overflow:hidden;
   }
   
   ::-webkit-scrollbar {

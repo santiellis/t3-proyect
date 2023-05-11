@@ -6,6 +6,7 @@ import Image from "next/image";
 import { LoadingPage } from "~/components/loading";
 import { PostView } from "~/components/postview";
 import { generateSSGHelper } from "~/server/helpers/ssgHelper";
+import Link from "next/link";
 
 
 const ProfileFeed = (props: {userId:string}) =>{
@@ -35,6 +36,11 @@ const ProfilePage: NextPage<{ username: string }> = ({ username }) => {
       </Head>
       <PageLayout>
         <div className="h-36 bg-slate-600 relative">
+        <Link href="https://t3-proyect.santiagoellis.dev/">
+        <div className="text-slate-400 ml-4">
+         ↼ Back Home
+        </div>
+        </Link>
           <Image
             alt={`${data.username ?? ""}'s profile pic`}
             src={data.profileImageUrl}
